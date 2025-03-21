@@ -1,0 +1,53 @@
+//map 初体验
+//学校选拔篮球队员，每间宿舍最多有 4 个人。现给出宿舍列表，请找出每个宿舍最高的同学。定义一个学生类 Student，有身高 height，体重 weight 等。
+输入格式:
+
+首先输入一个整型数 n （1≤n≤10 6 ），表示有 n 位同学。 
+
+紧跟着 n 行输入，每一行格式为：宿舍号 name height weight。
+宿舍号的区间为 [0, 999999]， name 由字母组成，长度小于 16，height，weight 为正整数。  
+
+输出格式:
+
+按宿舍号从小到大排序，输出每间宿舍身高最高的同学信息。题目保证每间宿舍只有一位身高最高的同学。
+
+注意宿舍号不足 6 位的，要按 6 位补齐前导 0。
+
+
+
+#include<iostream>
+#include<vector>
+#include<string>
+#include<map>
+#include<iomanip>
+using namespace std;
+class Student
+{
+public:
+    int num;
+    string name;
+    int height;
+    int weight;
+};
+int main()
+{
+    int n;
+    cin >> n;
+    
+    vector <Student>stu(n);
+    
+    map<int,Student>stu_map;
+    
+    for(int i=0;i<n;i++)
+        cin >> stu[i].num >> stu[i].name >> stu[i].height >> stu[i].weight;
+        if(stu_map[stu[i].num].height<stu[i].height)
+            stu_map[stu[i].num].name=stu[i].name;
+            stu_map[stu[i].num].height=stu[i].height;
+            stu_map[stu[i].num].weight=stu[i].weight;
+    
+    for(map<int,Student>::iterator iter=stu_map.begin(); iter!=stu_map.end(); iter++)
+        cout << setfill('0') << setw(6) << iter->first << " ";
+        cout<<iter->second.name << " " << iter->second.height << " " << iter->second.weight << endl;
+    
+    return 0;
+}
