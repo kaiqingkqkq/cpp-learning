@@ -1,0 +1,218 @@
+C++中的map翻译为映射，不是地图！！！ 也是常用的STL容器。它在算法竞赛中应用十分广泛，因为map可以将任何基本类型（包括STL容器）映射到任何基本类型（包括STL容器），十分灵活。因此我们很有必要来熟练map的常用用法。
+
+目录
+
+1、map的定义
+2、map容器内元素的访问
+3、map常用函数实例解析：
+1、find()：
+2、erase():
+3、size()：
+4、clear():
+4、拓展
+1、map的定义
+单独定义一个map:
+
+map<typename1, typename2> mp;
+其中，typename1是键的类型，typename2是值的类型。
+
+注：如果是字符串到整型的映射，必须使用string而不能用char数组！
+
+map<string, int> mp;
+这是因为char数组作为数组，是不能被作为键值的。所以如果想用字符串做映射，必须用string。
+
+再举个栗子例子：map的键和值也可以是STL容器，例如以下代码将一个set容器映射到一个字符串：
+
+map<set<int>, string> mp;
+2、map容器内元素的访问
+一般有两种访问方式：通过下标访问或通过迭代器访问：
+
+1、通过下标访问：
+
+和普通数组一样，例如一个定义为map<char, int> mp的map来说，可以直接使用mp['c']的方式来访问它对应的int整数。可以直接使用mp['c'] = 20这样的方式来赋值：
+
+map<char, int> mp; 
+mp['c'] = 20;
+cout << mp['c'];	//答案输出20
+但是要注意的是，map中的键是唯一的，例如以下代码：
+
+map<char, int> mp; 
+mp['c'] = 20;
+mp['c'] = 30;	//30覆盖了20 
+mp['c'] = 666; 	//666覆盖了30 
+cout << mp['c'];	//答案输出666 
+2、通过迭代器访问：
+
+map迭代器的定义和其他STL容器迭代器定义的方式相同：
+
+map<typename1, typename2>::iterator it;
+这样就得到了迭代器 it 。
+
+map可以使用it->first来访问键，it->second来访问值：
+
+#include<iostream>
+#include<map>
+using namespace std;
+int main(){
+	map<char, int> mp; 
+	mp['a'] = 222;
+	mp['b'] = 333;	
+	mp['c'] = 444;
+	for(map<char, int>::iterator it = mp.begin(); it != mp.end(); it++){
+		cout << it->first;	 
+		cout << " "; 
+		cout << it->second;
+		cout << endl;
+	} 	
+	return 0;
+}
+
+AI写代码
+代码输出结果：
+
+a 222
+b 333
+c 444
+还有一点要补充，就是map会以键从小到大的顺序自动排序，如：
+
+mp['c'] = 222;
+mp['a'] = 333;	
+mp['b'] = 444;
+顺序输出结果是（即按a < b < c的顺序从小到大排序）：
+
+a 333
+b 444
+c 222
+上述现象是因为，map内部是由红黑树实现的（set也是），在建立映射的过程中，会自动实现从小到大排序功能。
+
+3、map常用函数实例解析：
+1、find()：
+find(key)返回键为key映射的迭代器，时间复杂度为O(logN)，N为map中映射的个数：
+
+#include<iostream>
+#include<map>
+using namespace std;
+int main(){
+	map<char, int> mp; 
+	mp['a'] = 222;
+	mp['b'] = 333;	
+	mp['c'] = 444;
+	map<char, int>::iterator it = mp.find('b');
+	cout << it->first << " " << it->second;
+	return 0;
+}
+AI写代码
+输出结果：
+
+b 333
+2、erase():
+erase()有两种用法：1、删除单个元素。2、删除一个区间内所有的元素。
+
+① 删除单个元素：
+
+mp.erase(it)，it为需要删除的元素的迭代器。时间复杂度为O(1)：
+
+#include<iostream>
+#include<map>
+using namespace std;
+int main(){
+	map<char, int> mp; 
+	mp['a'] = 222;
+	mp['b'] = 333;	
+	mp['c'] = 444;
+	map<char, int>::iterator it = mp.find('b');
+	mp.erase(it);
+	for(map<char, int>::iterator it = mp.begin(); it != mp.end(); it++){
+		cout << it->first << " " << it->second << endl;
+	}
+	return 0;
+}
+输出结果：
+
+a 222
+c 444
+mp.erase(key)，key为要删除的映射的键。时间复杂度O(logN)，N为map内元素的个数：
+
+#include<iostream>
+#include<map>
+using namespace std;
+int main(){
+	map<char, int> mp; 
+	mp['a'] = 222;
+	mp['b'] = 333;	
+	mp['c'] = 444;
+	//map<char, int>::iterator it = mp.find('b');
+	//mp.erase(it);
+	mp.erase('b');
+	for(map<char, int>::iterator it = mp.begin(); it != mp.end(); it++){
+		cout << it->first << " " << it->second << endl;
+	}
+	return 0;
+}
+
+输出结果：
+
+a 222
+c 444
+② 删除一个区间内所有的元素：
+
+mp.erase(first, last)，其中，first为需要删除的区间的起始迭代器，last为需要删除的区间末尾迭代器的下一个地址，即为删除左闭右开的区间[first, last)。时间复杂度为O(last - first)：
+
+#include<iostream>
+#include<map>
+using namespace std;
+int main(){
+	map<char, int> mp; 
+	mp['a'] = 222;
+	mp['b'] = 333;	
+	mp['c'] = 444;
+	map<char, int>::iterator it = mp.find('b');
+	mp.erase(it, mp.end()); //删除it之后的所有映射，即b 333和 c 444 
+	//mp.erase(it);
+	//mp.erase('b');
+	for(map<char, int>::iterator it = mp.begin(); it != mp.end(); it++){
+		cout << it->first << " " << it->second << endl;
+	}
+	return 0;
+}
+
+输出结果：
+
+a 222
+3、size()：
+size()用来获得map中映射的对数，复杂度为O(1)。
+
+#include<iostream>
+#include<map>
+using namespace std;
+int main(){
+	map<char, int> mp; 
+	mp['a'] = 222;
+	mp['b'] = 333;	
+	mp['c'] = 444;
+	cout << mp.size(); 
+	return 0;
+}
+输出结果：
+
+3
+4、clear():
+clear()用来清空map中的所有元素，复杂度为O(N)，N为map中元素个数：
+
+#include<iostream>
+#include<map>
+using namespace std;
+int main(){
+	map<char, int> mp; 
+	mp['a'] = 222;
+	mp['b'] = 333;	
+	mp['c'] = 444;
+	mp.clear();	//清空map
+	cout << mp.size(); 
+	return 0;
+}
+输出结果：
+
+0
+4、拓展
+        map的键和值是唯一的，如果需要一个键对应多个值，就只能用multimap。另外，C++11标准新增了unordered_map，以散列代替map内部的红黑树实现，使其可以用来处理只映射而不按key排序的需求，速度比map要快得多。
